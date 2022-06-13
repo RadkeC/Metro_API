@@ -19,10 +19,8 @@ def get_db():
     db = Session()
     try:
         yield db
-        print('succesfully yelded db')
     finally:
         db.close()
-        print('closed db')
 
 
 
