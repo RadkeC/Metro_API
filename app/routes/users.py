@@ -1,0 +1,73 @@
+from fastapi import APIRouter, status, HTTPException, Depends
+from typing import List
+from sqlalchemy.orm import Session
+from datetime import datetime
+
+
+from app.database import get_db
+from app import schemas, models
+
+router = APIRouter(
+    prefix="",
+    tags=['Users']
+)
+
+
+# User
+@router.post("/user_create", status_code=status.HTTP_201_CREATED, response_model=schemas.User_Response)
+def user_create(user: schemas.User_Create, db: Session = Depends(get_db)):
+    if db.query(models.User).filter(models.User.login == user.login).first():
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=f'User with login: "{user.login}" already exists')
+    new_user = models.User(created_by='Radke', created_at=datetime.now(), **user.dict())# authentication
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+
+@router.get("/user_get_all", status_code=status.HTTP_200_OK, response_model=List[schemas.User_Response])
+def user_get_all(db: Session = Depends(get_db)):
+    users = db.query(models.User).order_by(models.User.created_at).all()
+    if not users:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="There are not any users profile created")
+    return users
+
+
+@router.get("/user_get/{login}", status_code=status.HTTP_200_OK, response_model=schemas.User_Response)
+def user_get(login: str, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.login == login).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"User: {login} does not exists")
+    return user
+
+
+@router.delete("/user_delete/{login}", status_code=status.HTTP_200_OK)
+def user_delete(login: str, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.login == login).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"User: {login} does not exists")
+    user.delete(synchronize_session=False)
+    db.commit()
+
+    return f"Successfully deleted user: {login}"
+
+
+@router.put("/user_update", status_code=status.HTTP_202_ACCEPTED, response_model=schemas.User_Response)
+def user_update(user: schemas.User_Update, db: Session = Depends(get_db)):
+    user_to_update_query = db.query(models.User).filter(models.User.id == user.id)
+    user_to_update = user_to_update_query.first()
+    if not user_to_update:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"User with id: {user.id} does not exists")
+    user = user.dict()
+    user['created_by'] = user_to_update.created_by
+    user['created_at'] = user_to_update.created_at
+    user_to_update_query.update(user, synchronize_session=False)
+    db.commit()
+
+    return user_to_update
+

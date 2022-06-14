@@ -70,7 +70,7 @@ class User(Base):
     name = Column(String, nullable=False)
     forename = Column(String, nullable=False)
     department = Column(String, nullable=False)
-    login = Column(String, nullable=False)
+    login = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
     created_by = Column(String, nullable=False)  # mb foreign_key to user
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
