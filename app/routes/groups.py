@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 from app.database import get_db
-from app import schemas, models
+from app import schemas, models, oauth2
 
 router = APIRouter(
     prefix="",
@@ -15,12 +15,13 @@ router = APIRouter(
 
 # Group
 @router.post('/group_create', status_code=status.HTTP_201_CREATED, response_model=schemas.Group_Response)
-def group_create(group: schemas.Group_Create, db: Session = Depends(get_db)):
+def group_create(group: schemas.Group_Create, db: Session = Depends(get_db),
+                  current_user: int = Depends(oauth2.get_current_user)):
     if db.query(models.Group).filter(models.Group.name == group.name).first():
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f'Group with name: "{group.name}" already exists')
 
-    new_group = models.Group(created_by='Radke', created_at=str(datetime.now())[0:16], **group.dict()) # authorization
+    new_group = models.Group(created_by=current_user.login, created_at=str(datetime.now())[0:16], **group.dict())
     db.add(new_group)
     db.commit()
     db.refresh(new_group)
@@ -28,7 +29,7 @@ def group_create(group: schemas.Group_Create, db: Session = Depends(get_db)):
 
 
 @router.get("/group_get/{name}", status_code=status.HTTP_200_OK, response_model=schemas.Group_Response)
-def group_get(name: str, db: Session = Depends(get_db)):
+def group_get(name: str, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     group = db.query(models.Group).filter(models.Group.name == name).first()
     if not group:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -37,7 +38,7 @@ def group_get(name: str, db: Session = Depends(get_db)):
 
 
 @router.get('/group_get_all', status_code=status.HTTP_200_OK, response_model=List[schemas.Group_Response])
-def group_get_all(db: Session = Depends(get_db)):
+def group_get_all(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     groups = db.query(models.Group).order_by(models.Group.name).all()
     if not groups:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -46,7 +47,7 @@ def group_get_all(db: Session = Depends(get_db)):
 
 
 @router.delete('/group_delete/{name}', status_code=status.HTTP_200_OK)
-def group_delete(name: str, db: Session = Depends(get_db)):
+def group_delete(name: str, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     group = db.query(models.Group).filter(models.Group.name == name)
     if not group.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -58,14 +59,15 @@ def group_delete(name: str, db: Session = Depends(get_db)):
 
 
 @router.put('/group_update', status_code=status.HTTP_202_ACCEPTED, response_model=schemas.Group_Response)
-def group_update(group: schemas.Group_Update, db: Session = Depends(get_db)):
+def group_update(group: schemas.Group_Update, db: Session = Depends(get_db),
+                 current_user: int = Depends(oauth2.get_current_user)):
     group_to_update = db.query(models.Group).filter(models.Group.id == group.id)
     if not group_to_update.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'Group with id: "{group.id}" does not exists')
 
     group = group.dict()
-    group['created_by'] = group_to_update.first().created_by + '\n' + 'Radek' # authorization
+    group['created_by'] = group_to_update.first().created_by + '\n' + current_user.login
     group['created_at'] = group_to_update.first().created_at + '\n' + str(datetime.now())[0:16]
     group_to_update.update(group, synchronize_session=False)
     db.commit()

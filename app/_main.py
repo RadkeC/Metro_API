@@ -1,23 +1,29 @@
 from fastapi import FastAPI, Depends, status, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.database import get_db, engine
 from app import models
-from app.routes import users, groups, devices
+from app.routes import users, groups, devices, login
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(users.router)
 app.include_router(groups.router)
 app.include_router(devices.router)
-
-
-def is_admin(login, db):
-    if not db.query(models.User).filter(models.User.login == login).first().admin:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail="Logged user has not permission to perform that action")
+app.include_router(login.router)
 
 
 @app.get("/", status_code=status.HTTP_200_OK)
@@ -25,11 +31,7 @@ def start(db: Session = Depends(get_db)):
     return {"message": "Welcome in Metro API"}
 
 
-                        # authorization - dodać automatyczny user
-#autentication
-#hasshowanie haseł
-#logowanie
-#middleware - dostęp do api poprzez każdy url
+
 #alembic i doker ; heroku i git action
 
 

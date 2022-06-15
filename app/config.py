@@ -13,9 +13,14 @@ class Settings(BaseSettings):
     TOKEN_EXPIRATION_TIME: int
 
     class Config:
-        env_file = '.env'
+        env_file = 'app/.env'
+        #env_file = '.env'
 
 
 settings = Settings()
-#print(settings)
+
+#import fastapi.security.oauth2 as zxc
+
+
+#x = zxc.OAuth2PasswordRequestForm(username="Werka", password="q", scope='')
 

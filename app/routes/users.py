@@ -3,9 +3,9 @@ from typing import List
 from sqlalchemy.orm import Session
 from datetime import datetime
 
-
 from app.database import get_db
-from app import schemas, models
+from app import schemas, models, oauth2
+from app.utils import hash_password
 
 router = APIRouter(
     prefix="",
@@ -15,11 +15,13 @@ router = APIRouter(
 
 # User
 @router.post("/user_create", status_code=status.HTTP_201_CREATED, response_model=schemas.User_Response)
-def user_create(user: schemas.User_Create, db: Session = Depends(get_db)):
+def user_create(user: schemas.User_Create, db: Session = Depends(get_db),
+                current_user: int = Depends(oauth2.get_current_user)):
     if db.query(models.User).filter(models.User.login == user.login).first():
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f'User with login: "{user.login}" already exists')
-    new_user = models.User(created_by='Radke', created_at=datetime.now(), **user.dict())# authentication
+    new_user = models.User(created_by=current_user.login, created_at=datetime.now(), **user.dict())
+    new_user.password = hash_password(new_user.password)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -27,7 +29,7 @@ def user_create(user: schemas.User_Create, db: Session = Depends(get_db)):
 
 
 @router.get("/user_get_all", status_code=status.HTTP_200_OK, response_model=List[schemas.User_Response])
-def user_get_all(db: Session = Depends(get_db)):
+def user_get_all(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     users = db.query(models.User).order_by(models.User.created_at).all()
     if not users:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -36,7 +38,7 @@ def user_get_all(db: Session = Depends(get_db)):
 
 
 @router.get("/user_get/{login}", status_code=status.HTTP_200_OK, response_model=schemas.User_Response)
-def user_get(login: str, db: Session = Depends(get_db)):
+def user_get(login: str, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     user = db.query(models.User).filter(models.User.login == login).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -45,7 +47,7 @@ def user_get(login: str, db: Session = Depends(get_db)):
 
 
 @router.delete("/user_delete/{login}", status_code=status.HTTP_200_OK)
-def user_delete(login: str, db: Session = Depends(get_db)):
+def user_delete(login: str, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     user = db.query(models.User).filter(models.User.login == login).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -57,7 +59,8 @@ def user_delete(login: str, db: Session = Depends(get_db)):
 
 
 @router.put("/user_update", status_code=status.HTTP_202_ACCEPTED, response_model=schemas.User_Response)
-def user_update(user: schemas.User_Update, db: Session = Depends(get_db)):
+def user_update(user: schemas.User_Update, db: Session = Depends(get_db),
+                  current_user: int = Depends(oauth2.get_current_user)):
     user_to_update_query = db.query(models.User).filter(models.User.id == user.id)
     user_to_update = user_to_update_query.first()
     if not user_to_update:
