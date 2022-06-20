@@ -52,6 +52,10 @@ def group_delete(name: str, db: Session = Depends(get_db), current_user: int = D
     if not group.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'Group with name: {name} does not exists')
+    if db.query(models.Device).filter(models.Device.group_name == name).first():
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=f'Group with name: {name} have existing devices. '
+                                   f'Edit or delete devices before deleting group')
     group.delete(synchronize_session=False)
     db.commit()
 
@@ -65,6 +69,11 @@ def group_update(group: schemas.Group_Update, db: Session = Depends(get_db),
     if not group_to_update.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'Group with id: "{group.id}" does not exists')
+
+    if group.name != group_to_update.name:
+        devices = db.query(models.Device).filter(models.Device.group_name == group_to_update.name)
+        for device in devices:
+            device.group_name = group.name
 
     group = group.dict()
     group['created_by'] = group_to_update.first().created_by + '\n' + current_user.login

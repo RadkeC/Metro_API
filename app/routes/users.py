@@ -66,6 +66,18 @@ def user_update(user: schemas.User_Update, db: Session = Depends(get_db),
     if not user_to_update:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"User with id: {user.id} does not exists")
+
+    if user.login != user_to_update.login:
+        devices = db.query(models.Device).filter(models.Device.created_by == user_to_update.login)
+        for device in devices:
+            device.created_by = user.login
+        groups = db.query(models.Group).filter(models.Group.created_by == user_to_update.login)
+        for group in groups:
+            group.created_by = user.login
+        users = db.query(models.User).filter(models.User.created_by == user_to_update.login)
+        for use in users:
+            use.created_by = user.login
+
     user = user.dict()
     user['created_by'] = user_to_update.created_by
     user['created_at'] = user_to_update.created_at

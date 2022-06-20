@@ -32,6 +32,6 @@ def start(db: Session = Depends(get_db)):
 
 
 
-#alembic i doker ; heroku i git action
+# doker ; heroku i git action
 
 
