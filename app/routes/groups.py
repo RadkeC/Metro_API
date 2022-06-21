@@ -65,8 +65,9 @@ def group_delete(name: str, db: Session = Depends(get_db), current_user: int = D
 @router.put('/group_update', status_code=status.HTTP_202_ACCEPTED, response_model=schemas.Group_Response)
 def group_update(group: schemas.Group_Update, db: Session = Depends(get_db),
                  current_user: int = Depends(oauth2.get_current_user)):
-    group_to_update = db.query(models.Group).filter(models.Group.id == group.id)
-    if not group_to_update.first():
+    group_to_update_query = db.query(models.Group).filter(models.Group.id == group.id)
+    group_to_update = group_to_update_query.first()
+    if not group_to_update:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'Group with id: "{group.id}" does not exists')
 
@@ -76,10 +77,10 @@ def group_update(group: schemas.Group_Update, db: Session = Depends(get_db),
             device.group_name = group.name
 
     group = group.dict()
-    group['created_by'] = group_to_update.first().created_by + '\n' + current_user.login
-    group['created_at'] = group_to_update.first().created_at + '\n' + str(datetime.now())[0:16]
-    group_to_update.update(group, synchronize_session=False)
+    group['created_by'] = group_to_update.created_by + '\n' + current_user.login
+    group['created_at'] = group_to_update.created_at + '\n' + str(datetime.now())[0:16]
+    group_to_update_query.update(group, synchronize_session=False)
     db.commit()
 
-    return group_to_update.first()
+    return group_to_update
 

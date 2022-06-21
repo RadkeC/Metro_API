@@ -48,8 +48,8 @@ def user_get(login: str, db: Session = Depends(get_db), current_user: int = Depe
 
 @router.delete("/user_delete/{login}", status_code=status.HTTP_200_OK)
 def user_delete(login: str, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    user = db.query(models.User).filter(models.User.login == login).first()
-    if not user:
+    user = db.query(models.User).filter(models.User.login == login)
+    if not user.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"User: {login} does not exists")
     user.delete(synchronize_session=False)

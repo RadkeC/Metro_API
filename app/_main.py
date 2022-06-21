@@ -31,7 +31,6 @@ def start(db: Session = Depends(get_db)):
     return {"message": "Welcome in Metro API"}
 
 
-
-# doker ; heroku i git action
+# doker ; i git action
 
 
