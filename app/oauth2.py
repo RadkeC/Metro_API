@@ -9,7 +9,7 @@ from app.database import get_db
 from app import schemas, models
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='API/login')
 #oauth2_scheme_auth = OAuth2PasswordBearer(tokenUrl='login_authenticated')
 
 

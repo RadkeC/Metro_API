@@ -8,7 +8,7 @@ from app.database import get_db
 from app import schemas, models, oauth2
 
 router = APIRouter(
-    prefix="",
+    prefix="/API",
     tags=['Groups']
 )
 

@@ -8,7 +8,7 @@ from app import schemas, models, oauth2
 from app.utils import hash_password
 
 router = APIRouter(
-    prefix="",
+    prefix="/API",
     tags=['Users']
 )
 

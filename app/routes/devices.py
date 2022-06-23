@@ -10,7 +10,7 @@ from app import schemas, models, oauth2
 
 
 router = APIRouter(
-    prefix="",
+    prefix="/API",
     tags=['Devices']
 )
 

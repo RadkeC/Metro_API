@@ -1,3 +1,4 @@
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseSettings
 
 
@@ -12,12 +13,16 @@ class Settings(BaseSettings):
     ALGORITHM: str
     TOKEN_EXPIRATION_TIME: int
 
+    URL: str
+
     class Config:
         env_file = 'app/.env'
         #env_file = '.env'
 
 
 settings = Settings()
+
+templates = Jinja2Templates(directory="app/templates")
 
 #import fastapi.security.oauth2 as zxc
 
