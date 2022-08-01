@@ -1,0 +1,41 @@
+app:
+    |--- _main.py
+    |--- config.py
+    |--- database.py
+    |--- map
+    |--- models.py
+    |--- oauth.py
+    |--- schemas.py
+    |--- utils.py
+    |
+    |--- routes:
+    |           |--- devices.py
+    |           |--- groups.py
+    |           |--- login.py
+    |           |--- users.py
+    |           |
+    |           |--- sites:
+    |                      |--- device_site.py
+    |                      |--- group_site.py
+    |                      |--- login_site.py
+    |                      |--- main_site.py
+    |                      |--- user_site.py
+    |
+    |--- static:
+    |           |--- style_create_device.css
+    |           |--- style_create_group.css
+    |           |--- style_create_user.css
+    |           |--- style_login.css
+    |           |--- style_manage.css
+    |           |--- style_manage.css
+    |           |--- style_nav.css
+    |
+    |--- templates:
+                |--- base.html
+                |--- device_create.html
+                |--- device_manage.html
+                |--- group_create.html
+                |--- group_manage.html
+                |--- login.html
+                |--- user_create.html
+                |--- user_manage.html
