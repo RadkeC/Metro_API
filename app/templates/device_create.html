@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta http-equiv="Content-Language" content="pl" >
+    <meta charset="UTF-8">
+    {% if content.mode == 'create' %}
+        <title>Device create</title>
+    {% else %}
+        <title>Device Group</title>
+    {% endif %}
+    <link rel="stylesheet" href="./static/style_create_device.css">
+</head>
+
+{% extends "base.html" %}
+{% block content %}
+
+<section class="section_content_extending">
+<!-- Title -->
+    {% if content.mode == 'create' %}
+        <h2 class="h2_content_title">Dodawanie urządzenia</h2>
+    {% else %}
+        <h2 class="h2_content_title">Edycja urządzenia</h2>
+    {% endif %}
+
+<!-- Choose group  -->
+    <form method="post" name="device_create_form" autocomplete="off">
+        <p class="form_field_name">Grupa:</p>
+        <select class="form_field" name="selected_group" id="select_group_field"  onchange="this.form.submit()">
+            <option value=""></option>
+            {% for group in content.groups %}
+                {% if group == content.selected_group %}
+                    <option value="{{group}}" selected="selected">{{group}}</option>
+                {% else %}
+                    <option value="{{group}}">{{group}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+
+<!-- Let see Form -->
+        {% if content.selected_group %}
+
+<!-- ID for edit page -->
+            {% if content.mode == 'edit' %}
+                <p class="form_title" hidden>ID:</p>
+                <input class="content_form_id" type="text" name="id_form" value="{{content.form.id}}" hidden readonly/>
+                <br>
+            {% endif %}
+            <div class="create_device_form_container">
+<!-- Basic Form data -->
+                <div class="basic_parameters">
+                    <p class="form_field_name">Nazwa urządzenia:</p>
+                    <input class="form_field" type="text" name="name" value="{{content.form.name}}" required/>
+                    <br>
+                    <p class="form_field_name">Model:</p>
+                    <input class="form_field" type="text" name="model" value="{{content.form.model}}"/>
+                    <br>
+                    <p class="form_field_name">Obiekt:</p>
+                    <input class="form_field" type="text" name="ob" value="{{content.form.ob}}"/>
+                    <br>
+                    <p class="form_field_name">Lokalizacja:</p>
+                    <input class="form_field" type="text" name="localization" value="{{content.form.localization}}"/>
+                    <br>
+                    <p class="form_field_name">IP:</p>
+                    <input class="form_field" type="text" name="ip" value="{{content.form.ip}}" required/>
+                    <br>
+                    <p class="form_field_name">Maska:</p>
+                    <input class="form_field" type="text" name="mask" value="{{content.form.mask}}"/>
+                    <br>
+                    <p class="form_field_name">MAC:</p>
+                    <input class="form_field" type="text" name="mac" value="{{content.form.mac}}" required/>
+                    <br>
+                    <p class="form_field_name">Login:</p>
+                    <input class="form_field" type="text" name="login" value="{{content.form.login}}"/>
+                    <br>
+                    <p class="form_field_name">Hasło:</p>
+                    <input class="form_field" type="text" name="password" value="{{content.form.password}}"/>
+                    <br>
+                </div>
+<!-- Optional Form data -->
+                <div class="extending_parameters">
+                    {% if content.p.p1 %}
+                        <p class="form_field_name">{{content.p.p1}}:</p>
+                        <textarea class="form_field_textarea" name="p1" value="{{content.form.p1}}">{{content.form.p1}}</textarea>
+                        <br>
+                    {% endif %}
+                    {% if content.p.p2 %}
+                        <p class="form_field_name">{{content.p.p2}}:</p>
+                        <textarea class="form_field_textarea" name="p2" value="{{content.form.p2}}">{{content.form.p2}}</textarea>
+                        <br>
+                    {% endif %}
+                    {% if content.p.p3 %}
+                        <p class="form_field_name">{{content.p.p3}}:</p>
+                        <textarea class="form_field_textarea"  name="p3" value="{{content.form.p3}}">{{content.form.p3}}</textarea>
+                        <br>
+                    {% endif %}
+                    {% if content.p.p4 %}
+                        <p class="form_field_name">{{content.p.p4}}:</p>
+                        <textarea class="form_field_textarea" type="text" name="p4" value="{{content.form.p4}}">{{content.form.p4}}</textarea>
+                        <br>
+                    {% endif %}
+                </div>
+            </div>
+<!-- Buttons for Create/Edt -->
+            <div class="clearing_div"></div>
+            {% if content.mode == 'create' %}
+                <button class="create_form_button" type="submit" name="accept_button" value="True">Utwórz</button>
+            {% else %}
+                <button class="edit_form_button" type="submit" name="accept_button" value="True">Zapisz zmiany</button>
+                <button class="edit_form_button" type="submit" name="reject_button" value="True">Odrzuć zmiany</button>
+            {% endif %}
+        {% endif %}
+
+<!-- FORMPART TO RESEND DEVICE LIST AFTER REJECT/ACCEPT IN EDIT MODE -->
+        {% if content.mode == 'edit' %}
+            <div hidden>
+                <input name="selected_groups" value="{{content.content_to_resend.selected_groups}}">
+                <input name="filters" value="{{content.content_to_resend.filters}}">
+                <input name="y_offset" value="{{content.content_to_resend.y_offset}}">
+                <input name="sorting" value="{{content.content_to_resend.sorting}}">
+            </div>
+        {% endif %}
+
+    </form>
+
+<!-- Form to load_from_file -->
+    {% if content.mode == 'create' %}
+        <div class="div_load_from_file">
+            <form action="/load_from_file" method="post" enctype="multipart/form-data">
+                <input type="file" name="load_from_file" value="True" onchange="this.form.submit()" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+            </form>
+        </div>
+    {% endif %}
+
+<!-- Script for popup window - unused - changed into content.message -->
+    <script>
+        function InfoAlert() {
+          alert("Wymagany plik:\n\n Plik musi mieć rozszerzenie .xlsx o nazwach arkuszy odpowiadających grupom dodawanych urządzeń.\n\n Zawartość arkuszy powinna wyglądać jak tabela z zakładki Urządzenia -> Zarządzaj dla danej grupy: kolumny od Nazwa do Hasło");
+        }
+    </script>
+</section>
+{% endblock content %}
+</html>

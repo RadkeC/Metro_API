@@ -1,34 +1,17 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql.expression import text
+from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 
 from app.database import Base
 
 
-"""class Post(Base):
-    __tablename__ = "posts"
-
-    id = Column(Integer, primary_key=True, nullable=False)
-    title = Column(String, nullable=False)
-    content = Column(String, nullable=False)
-    published = Column(Boolean, server_default='TRUE', nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True),
-                        nullable=False, server_default=text('now()'))
-    owner_id = Column(Integer, ForeignKey(
-        "users.id", ondelete="CASCADE"), nullable=False)
-
-    owner = relationship("User")"""
-
-
+# Models of db tables
 class Group(Base):
     __tablename__ = 'grupa'
 
     id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String, nullable=False, unique=True)
-    created_by = Column(String, nullable=False) # mb foreign_key to user
+    created_by = Column(String, nullable=False)
     created_at = Column(String, nullable=False)
-    #created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     p1 = Column(String, nullable=True)
     p2 = Column(String, nullable=True)
     p3 = Column(String, nullable=True)
@@ -48,22 +31,17 @@ class Device(Base):
     ip = Column(String, nullable=False, unique=True)
     mask = Column(String, nullable=False)
     mac = Column(String, nullable=False, unique=True)
-    created_by = Column(String, nullable=False)  # mb foreign_key to user
+    created_by = Column(String, nullable=False)
     created_at = Column(String, nullable=False)
-    group_name = Column(String, nullable=False)  # mb foreign_key to group
-    #created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    group_name = Column(String, nullable=False)
     p1 = Column(String, nullable=True)
     p2 = Column(String, nullable=True)
     p3 = Column(String, nullable=True)
     p4 = Column(String, nullable=True)
 
 
-    #group_id = Column(Integer, ForeignKey("grupa.id", ondelete="CASCADE"), nullable=False)
-    #group = relationship("Group")
-
-
 class User(Base):
-    __tablename__ = 'urzytkownik'
+    __tablename__ = 'uzytkownik'
 
     id = Column(Integer, primary_key=True, nullable=False)
     admin = Column(Boolean, nullable=False)
@@ -72,6 +50,6 @@ class User(Base):
     department = Column(String, nullable=False)
     login = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
-    created_by = Column(String, nullable=False)  # mb foreign_key to user
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
-
+    created_by = Column(String, nullable=False)
+    created_at = Column(String, nullable=False)
+    #created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))

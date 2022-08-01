@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Device manage</title>
+    <link rel="stylesheet" href="./static/style_manage.css">
+    <style>
+        #scrollDemo {
+            height: 200px;
+            width: 200px;
+            overflow: auto;
+            background-color: #f0db4f
+        }
+
+        #scrollDemo p {
+            /* show the scrollbar */
+            height: 300px;
+            width: 300px;
+        }
+    </style>
+</head>
+
+{% extends "base.html" %}
+{% block content %}
+
+
+ <form method="post" name="device_manage_form" onkeydown="return event.key != 'Enter';" autocomplete="off">
+    <div class="content_div_form">
+
+<!-- Buttons with groups names -->
+        <div class="content_div_form_leftside" id="groups_list_buttons">
+            <div class="content_div_form_checkbox">
+                <div class="list_title">
+                    <p>Grupy</p>
+                </div>
+                {% for group in content.groups %}
+                    {% if group.selected %}
+                        <input class="checkbox_button_on" type="submit" name="group_checkbox" value="{{group.name}}">
+                        <br>
+                    {% else %}
+                        <input class="checkbox_button_off" type="submit" name="group_checkbox" value="{{group.name}}">
+                        <br>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+        </div>
+
+<!-- List of options with checkboxes -->
+        <div class="content_div_form_rightside">
+            <table class="content_table_form_parameters">
+                <thead>
+                    <tr class="content_table_form_title"> <th> Wł./Wył. <th> Dokładna wartość <th class="filter_form_input_column"> Szukana fraza
+                <tbody>
+                    {% for parameter in content.device_parameters %}
+                        <tr class="content_table_form_row">
+<!-- IS ON-->
+                            {% if content.form[parameter.1] %}
+                                <td> <input type="checkbox" name="{{parameter.1}}" value="True" onclick="this.form.submit()" checked>
+<!-- IS EXACTLY -->
+                                {% if content.form[parameter.2] %}
+                                    <td> <input type="checkbox" name="{{parameter.2}}" value="True" onclick="this.form.submit()" checked >
+                                    <td> <input class="filter_form_input" type="text" name="{{parameter.0}}" placeholder="{{parameter.3}}" value="{{content.form[parameter.0]}}">
+<!-- IS CONSTRAITS -->
+                                {% else %}
+                                    <td> <input type="checkbox" name="{{parameter.2}}" value="True" onclick="this.form.submit()">
+                                    <td> <input class="filter_form_input" type="text" name="{{parameter.0}}" placeholder="{{parameter.4}}" value="{{content.form[parameter.0]}}">
+                                {% endif %}
+<!-- IS OFF -->
+                            {% else %}
+                                <td> <input type="checkbox" name="{{parameter.1}}" value="True" onclick="this.form.submit()">
+
+                                {% if content.form[parameter.2] %}
+                                    <td> <input type="checkbox" name="{{parameter.2}}" value="True" onclick="this.form.submit()" checked >
+                                    <td> <input class="filter_form_input" class="text_input_greyed"  type="text" name="{{parameter.0}}" placeholder="{{parameter.3}}" value="{{content.form[parameter.0]}}" readonly>
+
+                                {% else %}
+                                    <td> <input type="checkbox" name="{{parameter.2}}" value="True" onclick="this.form.submit()">
+                                    <td> <input class="filter_form_input" class="text_input_greyed" type="text" name="{{parameter.0}}" placeholder="{{parameter.4}}" value="{{content.form[parameter.0]}}" readonly>
+                                {% endif %}
+                            {% endif %}
+                    {% endfor %}
+            </table>
+        </div>
+        <div class="clearing_div"></div>
+        <div class="content_div_filter_buttons">
+            {% if content.selected_groups %}
+                <button class="content_filter_button" type="submit" name="toggle_button" value="uncheck">ODZNACZ WSZYSTKIE GRUPY</button>
+            {% else %}
+                <button class="content_filter_button" type="submit" name="toggle_button" value="check">ZAZNACZ WSZYSTKIE GRUPY</button>
+            {% endif %}
+            <button class="content_filter_button" type="submit" name="show_button" value="show" onclick="getScrollYdiv()">POKAŻ URZĄDZENIA </button>
+            <button class="content_filter_button" type="submit" name="generate_button" value="generate">EKSPORTUJ</button>
+        </div>
+<!-- FORMPART TO RESEND DEVICE LIST OPTIONS -->
+        <input type="hidden" name="selected_groups" value="{{content.selected_groups}}">
+        <input type="hidden" name="sorting" value="{{content.sorting}}">
+    </div>
+
+ <!-- Tables of devices -->
+    {% if content.table %}
+        <div class="content_div_table">
+<!-- Itering through groups -->
+            {% for table in content.table %}
+                <br>
+                <h2 class="h2_content_title">{{table.table_name}}</h2>
+                <br>
+
+<!-- If group not empty -->
+                {% if table.table_content %}
+                    <table class="content_table_group">
+                        <thead>
+                            <tr class="content_table_title">
+<!-- FROM table TAKE TITLES -->
+                                {% for title in table.table_title %}
+                                    <th> {{title.title_name}}
+                                {% endfor %}
+<!-- IF ADMIN CREATE EDIT/DELETE OPTIONS -->
+                                {% if content.admin %}
+                                    <th> Edytuj <th> Usuń
+                                {% endif %}
+                        <tbody>
+<!-- Empty cell bsc of no lp sort option (ASC/DESC) -->
+                            <td>
+<!-- Adding sort buttons -->
+                            {% for title in table.table_title %}
+                                {% if not title.title_name == 'Lp' %}
+                                    {% if title.title_var == table.sort_by %}
+                                        {% if table.sort_way == 'asc' %}
+                                            <td><button class="asc_sorting_button" type="submit" name="sorting_button" value="{{table.table_name}}<>{{title.title_var}}<>desc" onclick="getScrollY()">ASC</button>
+                                        {% elif table.sort_way == 'desc' %}
+                                            <td><button class="desc_sorting_button" type="submit" name="sorting_button" value="{{table.table_name}}<>{{title.title_var}}<>asc" onclick="getScrollY()">DESC</button>
+                                        {% endif %}
+<!-- Default sorting if not in content.table.sort_by -->
+                                    {% else %}
+                                        <td><button class="sorting_button" type="submit" name="sorting_button" value="{{table.table_name}}<>{{title.title_var}}<>asc" onclick="getScrollY()">ASC</button>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+<!-- Empty cells bsc of no Edit/Delete sort option (ASC/DESC) -->
+                            <td>
+                            <td>
+<!-- Itering through rows of table -->
+                            {% for row in table.table_content %}
+<!-- PARAMETERS -->
+                                <tr class="content_table_row">
+                                    {% for title in table.table_title %}
+                                        <td> <span style="white-space: pre-line">{{row[title.title_var]}}</span>
+                                    {% endfor %}
+<!-- ADMIN BUTTONS -->
+                                    {% if content.admin %}
+                                        <td><button class="edit_button" type="submit" name="edit_button" value="{{row.name}}" onclick="getScrollY()">></button>
+                                        <td><button class="delete_button" type="submit" name="delete_button" value="{{row.name}}" onclick="getScrollY()">X</button>
+                                    {% endif %}
+                            {% endfor %}
+                    </table>
+
+<!-- If group empty -->
+                {% else %}
+                    <p>Grupa {{table.table_name}} nie ma urządzeń spełniających opisane wymagania</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+<!-- Value of scrolledY for resend -->
+     <input type="text" id="demo" name="y_offset" hidden>
+     <textarea id="div_Yscroll" name="y_offset_div" hidden>{{content.y_offset_div}}</textarea>
+</form>
+
+<!-- Script to mesure Yscroll value of page -->
+<script>
+function getScrollY() {
+    let y_offset = window.pageYOffset;
+    const myElement = document.getElementById("demo");
+    myElement.value = y_offset;
+}
+</script>
+
+<!-- Script to scroll window to position from previous render (resended value) -->
+<script>
+    window.scrollBy(0, {{content.y_offset}});
+</script>
+
+<!-- Script to mesure Yscroll value of div with buttons and scroll to position from previous render (resended value) -->
+<script>
+    const div_scroll = document.querySelector("#groups_list_buttons");
+    const div_scroll_output = document.querySelector("#div_Yscroll");
+
+    div_scroll.addEventListener("scroll", event => {
+        div_scroll_output.innerHTML = `${div_scroll.scrollTop}`;
+    }, {passive: true});
+
+    div_scroll.scrollBy(0, {{content.y_offset_div}});
+
+</script>
+
+{% endblock content %}
+</html>
