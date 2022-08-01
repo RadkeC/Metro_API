@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Manage</title>
+    <link rel="stylesheet" href="./static/style_manage.css">
+</head>
+
+{% extends "base.html" %}
+{% block content %}
+    <div class="content_div_table">
+        <br>
+        <h2 class="h2_content_title">UŻYTKOWNICY</h2>
+        <br>
+
+        <form method="post" name="user_manage_form" autocomplete="off">
+            <table class="content_table_group">
+
+<!-- Titles of table columns -->
+                <thead>
+                    <tr class="content_table_title"> <th> Lp <th> Nazwisko <th> Imię <th> Jednostka <th> Login <th> Uprawnienia <th> Tworzący/Edytujący <th> Stworzony/Edytowany
+                        {% if content.admin %}
+                            <th> Edytuj <th> Usuń
+                        {% endif %}
+<!-- Rows of table -->
+                <tbody>
+                    {% for row in content.table %}
+                    <tr class="content_table_row">
+                        <td> {{row.lp}} <td> {{row.forename}} <td> {{row.name}} <td> {{row.department}} <td> {{row.login}}
+                        {% if row.admin %}
+                            <td> Administrator
+                        {% else %}
+                            <td> Normalny
+                        {% endif %}
+                            <td ><span style="white-space: pre-line">{{row.created_by}} </span>
+                            <td ><span style="white-space: pre-line">{{row.created_at}} </span>
+<!-- Edit/delete buttons -> schema.Buttons -->
+                            {% if content.admin %}
+                                <td><button class="edit_button" type="submit" name="edit_button" value="{{row.login}}">></button>
+                                <td><button class="delete_button" type="submit" name="delete_button" value="{{row.login}}">X</button>
+                            {% endif %}
+                    {% endfor %}
+            </table>
+        </form>
+    </div>
+{% endblock content %}
+</html>

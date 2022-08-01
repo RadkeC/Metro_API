@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% if content.mode == 'create' %}
+        <title>User create</title>
+    {% else %}
+        <title>Edit User</title>
+    {% endif %}
+    <link rel="stylesheet" href="./static/style_create_user.css">
+</head>
+
+{% extends "base.html" %}
+{% block content %}
+<section class="section_content_extending">
+
+<!-- Title depending on content.mode -->
+    {% if content.mode == 'create' %}
+        <h2 class="h2_content_title">Dodawanie użytkownika</h2>
+    {% else %}
+        <h2 class="h2_content_title">Edycja użytkownika</h2>
+    {% endif %}
+
+<!-- Form to create/edit user depending on content.mode -->
+    <form method="post" name="user_create_form" onkeydown="return event.key != 'Enter';" autocomplete="off">
+        {% if content.mode == 'edit' %}
+            <p hidden class="form_title">ID:</p>
+            <input class="content_form_id" type="hidden" name="id" value="{{content.form.id}}" readonly/>
+            <br>
+        {% endif %}
+
+        <p class="form_field_name" id="select_name">Poziom dostępu:</p>
+        <div class="form_field_select_container">
+            <select class="form_field" id="select_user_field" name="admin">
+                <option value="0">Normalny</option>
+                <option value="1">Administrator</option>
+            </select>
+        </div>
+        <p class="form_field_name">Imię:</p>
+        <input class="form_field" type="text" name="name" value="{{content.form.name}}" required/>
+        <br>
+        <p class="form_field_name">Nazwisko:</p>
+        <input class="form_field" type="text" name="forename" value="{{content.form.forename}}" required/>
+        <br>
+        <p class="form_field_name">Jednostka organizacyjna:</p>
+        <input class="form_field" type="text" name="department" value="{{content.form.department}}" required/>
+        <br>
+        <p class="form_field_name">Login:</p>
+        <input class="form_field" type="text" name="login" value="{{content.form.login}}" required/>
+        <br>
+        <p class="form_field_name">Password:</p>
+        <input class="form_field" type="text" name="password" value="{{content.form.password}}" required/>
+        <br>
+
+<!-- Form buttons depending on content.mode -> schemas.Buttons -->
+        {% if content.mode == 'create' %}
+            <button class="create_form_button" type="submit" formmethod="post" name="accept_button" value="True">Dodaj</button>
+        {% else %}
+            <button class="edit_form_button" type="submit" name="accept_button" value="True">Zapisz zmiany</button>
+            <button class="edit_form_button" name="reject_button" value="True" formmethod="get"><a href="{{url_for('get_user_manage')}}" style="text-decoration: none;">Odrzuć zmiany</a></button>
+        {% endif %}
+    </form>
+</section>
+{% endblock content %}
+</html>
+
+
