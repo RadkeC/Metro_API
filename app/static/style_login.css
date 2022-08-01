@@ -1,0 +1,83 @@
+* {
+  margin: 0px 0px;
+  padding: 0px 0px;
+}
+
+html {
+    --color_first: #FDD700; /* menu nav, footer */
+    --color_second: #FF0000; /* menu borders , hoover */
+    --color_third: #fcb103; /* background */
+    --color_fourth: #0000FF; /* form border */
+
+    --width_login_box: 300px;
+}
+
+.body {
+    background-color: var(--color_third);    /*#FFFF00;*/
+}
+
+/* Header */
+.login_title {
+    margin:auto;
+    padding: 10px;
+
+    background-color: var(--color_first);
+
+    border-style: solid;
+    border-width: 5px;
+    border-color: var(--color_second);
+}
+
+h1 {
+    text-align:center;
+
+    font-family: "Times New Roman", Times, serif;
+    font-style: italic;
+    font-weight: bold;
+    font-variant: small-caps;
+    font-size: 7vw;
+}
+
+/* Form */
+.login_form_div {
+    width: var(--width_login_box);
+    margin: 100px auto 50px auto;
+
+    line-height: 2.5em;
+    text-align: left;
+}
+
+.form-title {
+    font-size: 2em;
+}
+
+input {
+    width: 100%;
+    height: 1.5em;
+}
+
+button {
+    width: calc(var(--width_login_box)/3);
+    height: 1.5em;
+    margin-top: 20px;
+    margin-left: calc(var(--width_login_box) / 3);
+    margin-right: calc(var(--width_login_box) / 3);
+
+    font-size: 1.5em;
+}
+
+/* Message field */
+p {
+    width: var(--width_login_box);
+    margin: auto;
+    padding: 20px;
+
+    text-align: center;
+    font-size: 1.5em;
+
+    background-color: var(--color_first);
+
+    border-style: solid;
+    border-width: 5px;
+    border-color: var(--color_second);
+}

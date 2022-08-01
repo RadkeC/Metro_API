@@ -1,0 +1,88 @@
+html {
+    --color_first: #FDD700; /* menu nav, footer */
+    --color_second: #FF0000; /* borders , hoover */
+    --color_third: #fcb103; /* background */
+    --color_fourth: #0000FF; /* form border */
+
+    --width_form_box: 350px;
+    --width_form_field: 100%;
+    --width_message_box: calc(350px*2.5);
+}
+
+body {
+    background-color: var(--color_third);
+}
+
+.section_content_extending {
+    width: var(--width_form_box);
+    margin: 0px auto 0 auto;
+}
+
+.h2_content_title {
+    padding: 20px 0 10px 0;
+
+    text-align: center;
+    font-size: 2em;
+}
+
+/* Form field */
+.form_field_name {
+    margin: 3px 0 3px 0;
+    font-size: 1.2em;
+}
+
+.form_field{
+    width: var(--width_form_field);
+    height: 1.5em;
+    padding: 3px;
+}
+
+/* Buttons */
+.create_form_button {
+    width: calc(var(--width_form_box) / 3);
+    height: 1.5em;
+    margin-top: 20px;
+    margin-left: calc(var(--width_form_box) / 3);
+    margin-right: calc(var(--width_form_box) / 3);
+
+    font-size: 1.5em;
+}
+
+.edit_form_button {
+    width: calc(var(--width_form_box) / 3);
+    height: 2em;
+    margin-top: 20px;
+
+    font-size: 1em;
+
+    background-color: #00FF00;
+}
+
+.edit_form_button:last-of-type{
+    float: right;
+
+    background-color: #FF0000;
+}
+
+
+/* Message field */
+.p_message {
+    max - width: calc(100% - 6px);
+    width: var(--width_message_box);
+    margin: auto;
+    margin-top: 20px;
+    padding: 10px;
+
+    text-align: center;
+    font-size: 1em;
+
+    background-color: var(--color_first);
+
+    border-style: solid;
+    border-width: 3px;
+    border-color: var(--color_second);
+}
+
+
+
+

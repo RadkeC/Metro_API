@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% if content.mode == 'create' %}
+        <title>Group create</title>
+    {% else %}
+        <title>Edit Group</title>
+    {% endif %}
+    <link rel="stylesheet" href="./static/test.css">
+</head>
+
+
+{% extends "base.html" %}
+{% block content %}
+
+<section class="inside">
+    <div class="ins">
+        <p>test field</p>
+    </div>
+
+
+</section>
+
+{% endblock content %}
+
+
