@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+    <link rel="stylesheet" href="./static/style_nav.css">
+</head>
+
+<body>
+<!-- Menu -->
+    <section class="section_nav">
+        <ol>
+            <li class="li_menu">Grupy
+                  <ul>
+                      <li><a href="{{url_for('get_group_create')}}">Utwórz</a></li>
+                      <li><a href="{{url_for('get_group_manage')}}">Zarządzaj</a></li>
+                  </ul>
+            </li>
+            <li class="li_menu">Urządzenia
+                  <ul>
+                      <li><a href="{{url_for('get_device_create')}}">Dodaj</a></li>
+                      <li><a href="{{url_for('get_device_manage')}}">Zarządzaj</a></li>
+                  </ul>
+            </li>
+            <li class="li_menu">Użytkownicy
+                  <ul>
+                      <li><a href="{{url_for('get_user_create')}}">Dodaj</a></li>
+                      <li><a href="{{url_for('get_user_manage')}}">Zarządzaj</a></li>
+                      <!-- <li><a href="{{url_for('get_user_my')}}">Moje dane</a></li> -->
+                  </ul>
+            </li>
+            <li class="li_title">
+                <div class="div_title">
+                    <h1 class="h1_title">The Device's Grandmaster</h1>
+                </div>
+
+            </li>
+            <li class="li_menu">{{ content.username }}
+                 <ul>
+                      <li><a href="{{url_for('get_logout')}}">Wyloguj</a></li>
+                 </ul>
+            </li>
+        </ol>
+    </section>
+
+<!-- Content block Raport and message -->
+    <section class="section_content">
+        {% block content %}
+        {% endblock content %}
+
+        {% if content.raport %}
+            <h2 class="h2_content_title">Raport z dodawania urządzeń z pliku</h2>
+            <form method="post">
+                <button type="submit" name="download_raport_button" value="download" formaction="./raport" formmethod="post">Pobierz raport</button>
+            </form>
+            {% for line in content.raport %}
+                {% if line == '<br>' %}
+                    <br>
+                {% elif line[0] == 'S' %}
+                    <p style="color: #00BB00">{{line}}</p>
+                {% elif line[0] == 'G' %}
+                    <p style="font-size:20px; font-weight: bold">{{line}}</p>
+                {% else %}
+                    <p style="color: #FF0000">{{line}}</p>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {% if content.message %}
+            <p class="p_message"><span style="white-space: pre-line">{{content.message}}</span></p>
+        {% endif %}
+    </section>
+
+<!-- Footer -->
+    <section class="section_footer">
+        <p>Created by: Radke Lab's 2022</p>
+    </section>
+</body>
+</html>

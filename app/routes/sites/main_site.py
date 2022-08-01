@@ -1,12 +1,10 @@
-from fastapi import APIRouter, Request, Response, status, Form, Cookie
+from fastapi import APIRouter, Request, status, Cookie
 from fastapi.responses import RedirectResponse
-import requests
-from bs4 import BeautifulSoup
-from json import loads as json_loads
 
 from app.config import templates
 from app.routes.sites.login_site import is_logged
-from typing import  Optional
+
+
 router = APIRouter(
     prefix="",
     tags=['Main_site']
@@ -16,8 +14,22 @@ router = APIRouter(
 @router.get("/", status_code=status.HTTP_200_OK)
 def get_main(request: Request, token: str = Cookie(None)):
     print('get_main')
-    if is_logged(token, request):
-        return templates.TemplateResponse("main.html", {'request': request})
+    user = is_logged(token, request)
+    # Main case
+    if user:
+        content = {'username': user['login']}
+        return templates.TemplateResponse("base.html", {'request': request, 'content': content})
+
+    # Unauthorized case -> login page
     else:
         return RedirectResponse(request.url_for(name='get_login'), status_code=status.HTTP_303_SEE_OTHER)
 
+
+@router.get("/logout")
+def get_logout(request: Request, token: str = Cookie(None)):
+    print('get_logout')
+    user = is_logged(token, request)
+    # Response with delete cookie
+    response = RedirectResponse(request.url_for(name='get_login'), status_code=status.HTTP_303_SEE_OTHER)
+    response.delete_cookie('token', secure=True, httponly=True, samesite='none')
+    return response
