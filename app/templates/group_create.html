@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% if content.mode == 'create' %}
+        <title>Group create</title>
+    {% else %}
+        <title>Edit Group</title>
+    {% endif %}
+    <link rel="stylesheet" href="./static/style_create_group.css">
+</head>
+
+{% extends "base.html" %}
+{% block content %}
+
+<section class="section_content_extending">
+<!-- Title depending on content.mode -->
+    {% if content.mode == 'create' %}
+        <h2 class="h2_content_title">Tworzenie grupy</h2>
+    {% else %}
+        <h2 class="h2_content_title">Edycja grupy</h2>
+    {% endif %}
+
+<!-- Form to create/edit group depending on content.mode -->
+    <form method="post" name="group_create_form" onkeydown="return event.key != 'Enter';" autocomplete="off">
+        {% if content.mode == 'edit' %}
+            <p hidden class="form_id">ID:</p>
+            <input class="content_form_id" type="hidden" name="id" value="{{content.form.id}}" readonly/>
+            <br>
+        {% endif %}
+<!-- Form variables -->
+        <p class="form_field_name">Nazwa grupy:</p>
+        <input class="form_field" type="text" name="name" value="{{content.form.name}}" required/>
+        <br>
+        <p class="form_field_name">P1:</p>
+        <input class="form_field" type="text" name="p1" value="{{content.form.p1}}"/>
+        <br>
+        <p class="form_field_name">P2:</p>
+        <input class="form_field" type="text" name="p2" value="{{content.form.p2}}"/>
+        <br>
+        <p class="form_field_name">P3:</p>
+        <input class="form_field" type="text" name="p3" value="{{content.form.p3}}"/>
+        <br>
+        <p class="form_field_name">P4:</p>
+        <input class="form_field" type="text" name="p4" value="{{content.form.p4}}"/>
+        <br>
+
+<!-- Form buttons depending on content.mode -> schemas.Buttons -->
+        {% if content.mode == 'create' %}
+            <button class="create_form_button" type="submit" name="accept_button" value="True">Utwórz</button>
+        {% else %}
+            <button class="edit_form_button" type="submit" name="accept_button" value="True">Zapisz zmiany</button>
+            <button class="edit_form_button" type="submit" name="reject_button" value="True">Odrzuć zmiany</button>
+        {% endif %}
+    </form>
+</section>
+{% endblock content %}
+</html>
+
+

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Group Manage</title>
+    <link rel="stylesheet" href="./static/style_manage.css">
+</head>
+
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="content_div_table">
+        <br>
+        <h2 class="h2_content_title">GRUPY</h2>
+        <br>
+
+        <form method="post" name="group_manage_form" autocomplete="off">
+            <table class="content_table_group">
+<!-- Titles of table -->
+                {% if content.table %}
+                    <thead>
+                        <tr class="content_table_title"> <th> Lp </th><th> Nazwa Grupy </th><th> P1 </th><th> P2 </th><th> P3 </th><th> P4 </th><th> Tworzący/Edytujący </th><th> Stworzona/Edytowana </th>
+                            {% if content.admin %}
+                            <th> Edytuj </th><th> Usuń </th> </tr>
+                            {% endif %}
+                {% endif %}
+                <tbody>
+<!-- Rows of table -->
+                    {% for row in content.table %}
+                    <tr class="content_table_row"> <td> {{row.lp}} </td><th> {{row.name}} </th><td><span style="white-space: pre-line"> {{row.p1}} </span></td> <td><span style="white-space: pre-line"> {{row.p2}} </span></td> <td><span style="white-space: pre-line"> {{row.p3}}</span></td> <td><span style="white-space: pre-line"> {{row.p4}} </span></td>
+                            <td ><span style="white-space: pre-line">{{row.created_by}} </span></td>
+                            <td ><span style="white-space: pre-line">{{row.created_at}} </span></td>
+<!-- Edit/delete buttons -> schema.Buttons -->
+                            {% if content.admin %}
+                                <td><button class="edit_button" type="submit" name="edit_button" value="{{row.name}}">></button></td>
+                                <td><button class="delete_button" type="submit" name="delete_button" value="{{row.name}}">X</button></td>
+                            {% endif %}
+                    </tr>
+                    {% endfor %}
+            </table>
+        </form>
+    </div>
+{% endblock content %}
+</html>
