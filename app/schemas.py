@@ -174,7 +174,7 @@ class User_Update(User_Create):
 # users.py -> user_create, user_get_all, user_get, user_update
 class User_Response(User_Update):
     created_by: str
-    created_at:  datetime
+    created_at: str
 
     class Config:
         orm_mode = True

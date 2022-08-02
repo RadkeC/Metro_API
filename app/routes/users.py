@@ -23,8 +23,11 @@ def user_create(user: schemas.User_Create, db: Session = Depends(get_db),
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f'User with login: "{user.login}" already exists')
 
+    print(str(datetime.now()))
+    print(str(datetime.now())[0:16])
+
     # Hashing user password -> utils.py and adding device to db
-    new_user = models.User(created_by=current_user.login, created_at=datetime.now(), **user.dict())
+    new_user = models.User(created_by=current_user.login, created_at=str(datetime.now())[0:16], **user.dict())
     new_user.password = hash_password(new_user.password)
     db.add(new_user)
     db.commit()

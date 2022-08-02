@@ -1,10 +1,14 @@
-from fastapi import APIRouter, Request, Response, status, Form, Cookie
+from fastapi import APIRouter, Request, Response, status, Form, Cookie, Depends
 from fastapi.responses import RedirectResponse
+from sqlalchemy.orm import Session
 import requests
 from bs4 import BeautifulSoup
-from json import loads as json_loads, dumps as json_dumps
+from json import loads as json_loads
 
+from app import models
 from app.config import templates, settings
+from app.database import get_db
+from app.utils import hash_password
 
 
 router = APIRouter(
@@ -24,13 +28,17 @@ def is_logged(token, request):
 
 
 @router.get("/login", status_code=status.HTTP_200_OK)
-def get_login(request: Request, token: str = Cookie(None)):
+def get_login(request: Request, db: Session = Depends(get_db), token: str = Cookie(None)):
     # Creating initial user if no users at all
-    if requests.get(request.url_for('user_get_all'), headers={"Authorization": token}).status_code == 404:
-        initial_user = {'admin': True, 'name': 'Initial', 'forename': 'Initial', 'department': 'Initial',
-                        'login': settings.INITIAL_USER_LOGIN, 'password': settings.INITIAL_USER_PASSWORD}
-        data = json_dumps(initial_user)
-        requests.post(request.url_for('user_create'), headers={"Authorization": token}, data=data)
+    try:
+        new_user = models.User(**{'admin': True, 'name': 'Initial', 'forename': 'Initial', 'department': 'Initial',
+                                  'login': settings.INITIAL_USER_LOGIN, 'password': hash_password(settings.INITIAL_USER_PASSWORD),
+                                  'created_by': 'Initial', 'created_at': 'Initialization'})
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+    except:
+        print('Initial user exists')
 
     if token:
         # If have token and its valid -> main page
