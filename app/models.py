@@ -30,7 +30,7 @@ class Device(Base):
     password = Column(String, nullable=False)
     ip = Column(String, nullable=False, unique=True)
     mask = Column(String, nullable=False)
-    mac = Column(String, nullable=False, unique=True)
+    mac = Column(String, nullable=False)
     created_by = Column(String, nullable=False)
     created_at = Column(String, nullable=False)
     group_name = Column(String, nullable=False)

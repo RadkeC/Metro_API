@@ -23,12 +23,10 @@ def user_create(user: schemas.User_Create, db: Session = Depends(get_db),
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f'User with login: "{user.login}" already exists')
 
-    print(str(datetime.now()))
-    print(str(datetime.now())[0:16])
-
     # Hashing user password -> utils.py and adding device to db
     new_user = models.User(created_by=current_user.login, created_at=str(datetime.now())[0:16], **user.dict())
     new_user.password = hash_password(new_user.password)
+    print(new_user.password)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -113,6 +111,9 @@ def user_update(user: schemas.User_Update, db: Session = Depends(get_db),
         users = db.query(models.User).filter(models.User.created_by.like('%' + user_to_update.login + '%'))
         for use in users:
             use.created_by = (user.login).join(use.created_by.split(user_to_update.login))
+
+    # Hashing password
+    user.password = hash_password(user.password)
 
     # Adding update user and update date to input schema
     user = user.dict()
