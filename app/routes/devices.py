@@ -186,6 +186,26 @@ def device_delete(name: str, db: Session = Depends(get_db),
     return f"Successfully deleted device: {name}"
 
 
+@router.delete("/device_delete_all", status_code=status.HTTP_200_OK)
+def device_delete_all(group_name: str, db: Session = Depends(get_db),
+                      current_user: int = Depends(oauth2.get_current_user)):
+    # Check if user is permissed to do that, if not raise 401 error
+    is_admin(current_user)
+
+    # SQLAlchemy question for get device we want delete
+    device = db.query(models.Device).filter(models.Device.group_name == group_name)
+
+    if not device.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"There is not any device in: {group_name} group")
+
+    # Deleting device from db
+    device.delete(synchronize_session=False)
+    db.commit()
+
+    return f"Successfully deleted all devices in: {group_name} group"
+
+
 @router.put("/device_update", status_code=status.HTTP_202_ACCEPTED, response_model=schemas.Device_Response)
 def device_update(device: schemas.Device_Update, db: Session = Depends(get_db),
                   current_user: int = Depends(oauth2.get_current_user)):

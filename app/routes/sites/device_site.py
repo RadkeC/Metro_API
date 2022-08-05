@@ -44,8 +44,8 @@ titles = [{'title_name': 'Lp', 'title_var': 'lp'},
           {'title_name': 'MAC', 'title_var': 'mac'},
           {'title_name': 'Login', 'title_var': 'login'},
           {'title_name': 'Hasło', 'title_var': 'password'},
-          {'title_name': 'Tworzący/Edytujący', 'title_var': 'created_by'},
-          {'title_name': 'Stworzony/Edytowany', 'title_var': 'created_at'}]
+          {'title_name': 'Tworzący/\nEdytujący', 'title_var': 'created_by'},
+          {'title_name': 'Stworzony/\nEdytowany', 'title_var': 'created_at'}]
 
 
 # Function removing file for background task
@@ -432,7 +432,7 @@ def post_device_manage(request: Request, background_tasks: BackgroundTasks, toke
 
             # Requesting API and creating table
             if selected_groups:
-                # Coulter for Lp. of devices
+                # Counter for Lp. of devices
                 i = 0
                 # For every selected group different table
                 for group in selected_groups:
@@ -477,6 +477,7 @@ def post_device_manage(request: Request, background_tasks: BackgroundTasks, toke
                         # Creating list of table dicts - will be added to content later
                         table.append({'table_name': group, 'table_content': data, 'table_title': titles_local,
                                       'sort_by': sort_by, 'sort_way': sort_way})
+                        i = 0
 
             # If user didn't check groups (want all groups)
             #else:
