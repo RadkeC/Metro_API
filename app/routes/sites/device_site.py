@@ -633,71 +633,82 @@ def post_load_from_file(request: Request, token: str = Cookie(None), load_from_f
         file.close()
 
         # Create raport_file for user download
-        with open('raport.txt', 'w') as raport_file:
+        try:
+            with open('raport.txt', 'w') as raport_file:
 
-            # We iter through sheets (groups)
-            for sheet in sheets:
-                # If sheet_name is in group list
-                if sheet in groups:
-                    # Adding information that sheetname found in groupl list to raport
-                    raport_file.write(f"\n Grupa: {sheet} \n")
-                    raport.append('<br>')
-                    raport.append(f'Grupa: {sheet}')
-                    raport.append('<br>')
-                    # Load data from sheet
-                    df = pd.read_excel(io=load_from_file.filename, sheet_name=sheet)
+                # We iter through sheets (groups)
+                for sheet in sheets:
+                    # If sheet_name is in group list
+                    if sheet in groups:
+                        # Adding information that sheetname found in groupl list to raport
+                        raport_file.write(f"\n Grupa: {sheet} \n")
+                        raport.append('<br>')
+                        raport.append(f'Grupa: {sheet}')
+                        raport.append('<br>')
+                        # Load data from sheet
+                        df = pd.read_excel(io=load_from_file.filename, sheet_name=sheet)
 
-                    # List of parameters of group in sheetname
-                    group = groups_to_names[groups.index(sheet)]
-                    # Creating dict of expected titles in the sheet
-                    titles_local = titles.copy()
-                    titles_local.pop(0)
-                    del titles_local[-2:]
+                        # List of parameters of group in sheetname
+                        group = groups_to_names[groups.index(sheet)]
+                        # Creating dict of expected titles in the sheet
+                        titles_local = titles.copy()
+                        titles_local.pop(0)
+                        del titles_local[-2:]
 
-                    for p in ['p1', 'p2', 'p3', 'p4']:
-                        if group[p]:
-                            titles_local.insert(-2, {'title_name': group[p], 'title_var': p})
+                        for p in ['p1', 'p2', 'p3', 'p4']:
+                            if group[p]:
+                                titles_local.insert(-2, {'title_name': group[p], 'title_var': p})
 
-                    error = False
-                    # Getting list of column titles from sheet
-                    headers = df.head(0)
-                    # Checking if column titles matches expecting titles
-                    for n, head in enumerate(headers):
-                        if head != titles_local[n]['title_name']:
-                            raport_file.write(f"\n\tNiewłaściwe nagłówki dla grupy {sheet}")
-                            raport.append(f'Niewłaściwe nagłówki dla grupy {sheet}')
+                        error = False
+                        # Getting list of column titles from sheet
+                        headers = df.head(0)
+
+                        # Checking if column titles matches expecting titles
+                        if len(headers) == len(titles_local):
+                            for n, head in enumerate(headers):
+                                if head != titles_local[n]['title_name']:
+                                    raport_file.write(f"\n\tNiewłaściwe nagłówki dla grupy {sheet}")
+                                    raport.append(f'Niewłaściwe nagłówki dla grupy {sheet}')
+                                    error = True
+                        else:
+                            raport_file.write(f"\n\tRóżna liczba nagłówków dla grupy {sheet}")
+                            raport.append(f'Różna liczba nagłówków dla grupy {sheet}')
                             error = True
 
-                    # If titles are ok we start adding devices
-                    if not error:
-                        # Changing df to list
-                        lines = df.values.tolist()
-                        for line in lines:
-                            # Creating device dict for request API
-                            device = {'group_name': sheet}
-                            for n, parameter in enumerate(titles_local):
-                                device[parameter['title_var']] = line[n]
+                        # If titles are ok we start adding devices
+                        if not error:
+                            # Changing df to list
+                            lines = df.values.tolist()
+                            for line in lines:
+                                # Creating device dict for request API
+                                device = {'group_name': sheet}
+                                for n, parameter in enumerate(titles_local):
+                                    device[parameter['title_var']] = line[n]
 
-                            data = json_dumps(device)
-                            req_response = requests.post(request.url_for('device_create'), headers={"Authorization": token},
-                                                         data=data)
-                            # Adding infos to raport
-                            if req_response.status_code == 201:
-                                raport_file.write(f'\n\tSukces - urządzenie: {device["name"]}')
-                                raport.append(f'Sukces - urządzenie: {device["name"]}')
-                            elif req_response.status_code == 403:
-                                raport_file.write(f'\n\tPorażka - urządzenie: {device["name"]} - powtarzające się Nazwa, IP lub MAC')
-                                raport.append(f'Porażka - urządzenie: {device["name"]} - powtarzające się Nazwa, IP lub MAC')
-                            elif req_response.status_code == 422:
-                                raport_file.write(f'\n\tPorażka - urządzenie: {device["name"]} - niewłaściwe dane wejściowe')
-                                raport.append(f'Porażka - urządzenie: {device["name"]} - niewłaściwe dane wejściowe')
-                            else:
-                                raport_file.write(f'\n\tPorażka - urządzenie: {device["name"]} - nieznany błąd')
-                                raport.append(f'Porażka - urządzenie: {device["name"]} - nieznany błąd')
-                    raport_file.write(f'\n')
+                                data = json_dumps(device)
+                                req_response = requests.post(request.url_for('device_create'), headers={"Authorization": token},
+                                                             data=data)
+                                # Adding infos to raport
+                                if req_response.status_code == 201:
+                                    raport_file.write(f'\n\tSukces - urządzenie: {device["name"]}')
+                                    raport.append(f'Sukces - urządzenie: {device["name"]}')
+                                elif req_response.status_code == 403:
+                                    raport_file.write(f'\n\tPorażka - urządzenie: {device["name"]} - powtarzające się Nazwa, IP lub MAC')
+                                    raport.append(f'Porażka - urządzenie: {device["name"]} - powtarzające się Nazwa, IP lub MAC')
+                                elif req_response.status_code == 422:
+                                    raport_file.write(f'\n\tPorażka - urządzenie: {device["name"]} - niewłaściwe dane wejściowe')
+                                    raport.append(f'Porażka - urządzenie: {device["name"]} - niewłaściwe dane wejściowe')
+                                else:
+                                    raport_file.write(f'\n\tPorażka - urządzenie: {device["name"]} - nieznany błąd')
+                                    raport.append(f'Porażka - urządzenie: {device["name"]} - nieznany błąd')
+                        raport_file.write(f'\n')
+
+        except:
+            print('error')
 
         # Delete copy of file
-        os.remove(os.path.abspath(f'{load_from_file.filename}'))
+        finally:
+            os.remove(os.path.abspath(f'{load_from_file.filename}'))
 
         content = {'username': user['login'],
                    'selected_group': '',

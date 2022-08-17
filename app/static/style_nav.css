@@ -110,6 +110,12 @@ ol > li > ul> li:last-child > a:hover {
     background-color: var(--color_third);
 }
 
+/* raport */
+.section_raport {
+    padding-top: 10px;
+    padding-left: 10px;
+}
+
 /* footer */
 .section_footer {
     height: 30px;

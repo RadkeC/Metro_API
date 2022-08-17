@@ -49,21 +49,23 @@
         {% endblock content %}
 
         {% if content.raport %}
-            <h2 class="h2_content_title">Raport z dodawania urządzeń z pliku</h2>
-            <form method="post">
-                <button type="submit" name="download_raport_button" value="download" formaction="./raport" formmethod="post">Pobierz raport</button>
-            </form>
-            {% for line in content.raport %}
-                {% if line == '<br>' %}
-                    <br>
-                {% elif line[0] == 'S' %}
-                    <p style="color: #00BB00">{{line}}</p>
-                {% elif line[0] == 'G' %}
-                    <p style="font-size:20px; font-weight: bold">{{line}}</p>
-                {% else %}
-                    <p style="color: #FF0000">{{line}}</p>
-                {% endif %}
-            {% endfor %}
+            <section class="section_raport">
+                <h2 class="h2_content_title">Raport z dodawania urządzeń z pliku</h2>
+                <form method="post">
+                    <button type="submit" name="download_raport_button" value="download" formaction="./raport" formmethod="post">Pobierz raport</button>
+                </form>
+                {% for line in content.raport %}
+                    {% if line == '<br>' %}
+                        <br>
+                    {% elif line[0] == 'S' %}
+                        <p style="color: #00BB00; padding-left: 20px;">{{line}}</p>
+                    {% elif line[0] == 'G' %}
+                        <p style="font-size:20px; font-weight: bold">{{line}}</p>
+                    {% else %}
+                        <p style="color: #FF0000; padding-left: 20px;">{{line}}</p>
+                    {% endif %}
+                {% endfor %}
+            </section>
         {% endif %}
 
         {% if content.message %}
