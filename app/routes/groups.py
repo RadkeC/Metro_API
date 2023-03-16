@@ -30,7 +30,7 @@ def group_create(group: schemas.Group_Create, db: Session = Depends(get_db),
     new_group = models.Group(created_by=current_user.login, created_at=str(datetime.now())[0:16], **group.dict())
     db.add(new_group)
     db.commit()
-    db.refresh(new_group)
+    #db.refresh(new_group)
 
     return new_group
 

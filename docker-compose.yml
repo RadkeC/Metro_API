@@ -1,0 +1,59 @@
+version: "3"
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/usr/src/Metro_API
+    env_file:
+      - ./.env
+    environment:
+      - DATABASE_USERNAME=Metro_User
+      - DATABASE_PASSWORD=Metro_API_1120
+      - DATABASE_HOSTNAME=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=Metro_API_Database
+
+      - SECRET_KEY=asdhui23r73t84t89hwt98wh782gq3fhrgh389w98hjg983h
+      - ALGORITHM=HS256
+      - TOKEN_EXPIRATION_TIME=30
+
+      - PASSWORD_SECRET_KEY=<e\N>0pfRqb=]W~!Y4`.7m}U?P)(k-B1Zd,/^r{&oE_xsQF8yI";OA6c#*t$l%[CVi+gz'TvjXKaLuS:9h |JwH52G3MnD@
+
+      - INITIAL_USER_LOGIN=Administrator
+      - INITIAL_USER_PASSWORD=metro_api_1120
+
+    command: uvicorn app._main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - postgres
+
+  postgres: #must be equal as database_hostname
+    image: postgres
+    hostname: postgres
+    ports:
+        - "5432:5432"
+    expose:
+      - 5432
+    environment:
+      POSTGRES_USER: Metro_User
+      POSTGRES_PASSWORD: Metro_API_1120
+      POSTGRES_DB: Metro_API_Database
+    volumes:
+        - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - postgres
+    ports:
+      - "5555:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    restart: unless-stopped
+
+
+volumes:
+  postgres-data:

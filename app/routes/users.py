@@ -26,7 +26,6 @@ def user_create(user: schemas.User_Create, db: Session = Depends(get_db),
     # Hashing user password -> utils.py and adding device to db
     new_user = models.User(created_by=current_user.login, created_at=str(datetime.now())[0:16], **user.dict())
     new_user.password = hash_password(new_user.password)
-    print(new_user.password)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)

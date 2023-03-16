@@ -34,11 +34,12 @@ def device_create(device: schemas.Device_Create, db: Session = Depends(get_db),
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f'Device with MAC: "{device.mac}" already exists')
 
-    # Checking is send group exists
-    group = db.query(models.Group).filter(models.Group.name == device.group_name).first()
-    if not group.name:
+    # Checking if send group exists
+    group = db.query(models.Group).filter(models.Group.name == device.group_name).all()
+    if not group:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f'Group: "{group.name}" does not exists')
+                            detail=f'Group: "{device.group_name}" does not exists')
+    group = group[0]
 
     # Checking if device schema match group parameters p1-p4
     for [g, d] in [[group.p1, 'p1'], [group.p2, 'p2'], [group.p3, 'p3'], [group.p4, 'p4']]:

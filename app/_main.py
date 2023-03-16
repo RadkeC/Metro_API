@@ -44,7 +44,7 @@ app.include_router(user_site.router)
 
 @app.get("/API", status_code=status.HTTP_200_OK)
 def start(db: Session = Depends(get_db)):
-    return {"message": "Welcome in Metro API"}
+    return {"message": "Welcome in Metro API :)"}
 
 
 # doker ; i git action
