@@ -1,5 +1,9 @@
 __pycache__
 app/__pycache__
 venv/
+.pytest_cache
+.idea/
+data
+
 .env
 raport.txt
